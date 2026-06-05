@@ -1,26 +1,116 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --neu-bg: #e0e5ec;
+  --neu-shadow-dark: #a3b1c6;
+  --neu-shadow-light: #ffffff;
+  --neu-text: #4a5568;
+  --neu-text-muted: #8896a7;
+  --neu-accent: #6c9bcf;
+  --neu-accent-dark: #5a87b8;
+  --neu-success: #68d391;
+  --neu-danger: #fc8181;
+  --neu-warning: #f6ad55;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--neu-bg);
+  color: var(--neu-text);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* Raised card */
+.neu-card {
+  background: var(--neu-bg);
+  border-radius: 16px;
+  box-shadow: 6px 6px 14px var(--neu-shadow-dark), -6px -6px 14px var(--neu-shadow-light);
+}
+
+/* Pressed / inset */
+.neu-inset {
+  background: var(--neu-bg);
+  border-radius: 12px;
+  box-shadow: inset 4px 4px 10px var(--neu-shadow-dark), inset -4px -4px 10px var(--neu-shadow-light);
+}
+
+/* Flat soft surface */
+.neu-flat {
+  background: var(--neu-bg);
+  border-radius: 12px;
+  box-shadow: 3px 3px 8px var(--neu-shadow-dark), -3px -3px 8px var(--neu-shadow-light);
+}
+
+/* Button raised */
+.neu-btn {
+  background: var(--neu-bg);
+  border-radius: 10px;
+  box-shadow: 4px 4px 10px var(--neu-shadow-dark), -4px -4px 10px var(--neu-shadow-light);
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+  cursor: pointer;
+}
+
+.neu-btn:hover {
+  box-shadow: 6px 6px 14px var(--neu-shadow-dark), -6px -6px 14px var(--neu-shadow-light);
+}
+
+.neu-btn:active {
+  box-shadow: inset 3px 3px 8px var(--neu-shadow-dark), inset -3px -3px 8px var(--neu-shadow-light);
+  transform: scale(0.98);
+}
+
+/* Accent button */
+.neu-btn-accent {
+  background: linear-gradient(145deg, #7aadd6, #5f8ec2);
+  border-radius: 10px;
+  box-shadow: 4px 4px 10px var(--neu-shadow-dark), -4px -4px 10px var(--neu-shadow-light);
+  color: #fff;
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+  cursor: pointer;
+}
+
+.neu-btn-accent:hover {
+  box-shadow: 6px 6px 14px var(--neu-shadow-dark), -2px -2px 8px var(--neu-shadow-light);
+}
+
+.neu-btn-accent:active {
+  box-shadow: inset 3px 3px 8px rgba(0,0,0,0.15);
+  transform: scale(0.98);
+}
+
+.neu-btn-accent:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Input */
+.neu-input {
+  background: var(--neu-bg);
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  box-shadow: inset 4px 4px 8px var(--neu-shadow-dark), inset -4px -4px 8px var(--neu-shadow-light);
+  color: var(--neu-text);
+  transition: box-shadow 0.2s ease;
+}
+
+.neu-input:focus {
+  box-shadow: inset 4px 4px 10px var(--neu-shadow-dark), inset -4px -4px 10px var(--neu-shadow-light), 0 0 0 2px var(--neu-accent);
+}
+
+.neu-input::placeholder {
+  color: var(--neu-text-muted);
+}
+
+/* Progress bar track */
+.neu-track {
+  background: var(--neu-bg);
+  border-radius: 999px;
+  box-shadow: inset 2px 2px 5px var(--neu-shadow-dark), inset -2px -2px 5px var(--neu-shadow-light);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--neu-bg); }
+::-webkit-scrollbar-thumb { background: var(--neu-shadow-dark); border-radius: 999px; }
+

@@ -16,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${inter.className} h-full bg-gray-50`}>{children}</body>
+      <body className={`${inter.className} h-full`} style={{ backgroundColor: '#e0e5ec' }}>{children}</body>
     </html>
   );
 }

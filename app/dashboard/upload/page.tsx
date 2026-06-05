@@ -102,147 +102,140 @@ export default function UploadPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8 space-y-8">
-      <h2 className="text-2xl font-bold text-gray-900">Import data</h2>
+    <div className="max-w-4xl mx-auto py-4 space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold" style={{ color: '#4a5568' }}>Import data</h2>
+        <p className="text-sm mt-0.5" style={{ color: '#8896a7' }}>Add transactions via CSV or scan a receipt photo</p>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* CSV Import */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <div className="flex items-center gap-2 mb-1">
-            <Upload size={18} className="text-blue-600" />
-            <h3 className="font-semibold text-gray-900">Import transactions (CSV)</h3>
+        <div className="neu-card p-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="neu-flat w-10 h-10 flex items-center justify-center rounded-xl">
+              <Upload size={18} style={{ color: '#6c9bcf' }} />
+            </div>
+            <div>
+              <h3 className="font-semibold" style={{ color: '#4a5568' }}>Import CSV</h3>
+              <p className="text-xs" style={{ color: '#8896a7' }}>date, amount, merchant columns</p>
+            </div>
           </div>
-          <p className="text-sm text-gray-500 mb-4">
-            Upload a CSV with columns: date, amount, merchant (and optionally category, description).
-          </p>
 
           <form onSubmit={handleCsvUpload} className="space-y-3">
             <div
-              className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center cursor-pointer hover:border-blue-400 transition-colors"
+              className="neu-inset p-6 text-center cursor-pointer transition-all"
               onClick={() => csvInputRef.current?.click()}
             >
               {csvFile ? (
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{csvFile.name}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{(csvFile.size / 1024).toFixed(1)} KB</p>
+                  <p className="text-sm font-semibold" style={{ color: '#4a5568' }}>{csvFile.name}</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#8896a7' }}>{(csvFile.size / 1024).toFixed(1)} KB</p>
                 </div>
               ) : (
                 <div>
-                  <Upload size={24} className="text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">Click to select CSV file</p>
+                  <Upload size={22} className="mx-auto mb-2" style={{ color: '#a3b1c6' }} />
+                  <p className="text-sm" style={{ color: '#8896a7' }}>Click to select CSV file</p>
                 </div>
               )}
-              <input
-                ref={csvInputRef}
-                type="file"
-                accept=".csv"
-                className="hidden"
-                onChange={e => { setCsvFile(e.target.files?.[0] ?? null); setCsvResult(null) }}
-              />
+              <input ref={csvInputRef} type="file" accept=".csv" className="hidden"
+                onChange={e => { setCsvFile(e.target.files?.[0] ?? null); setCsvResult(null) }} />
             </div>
 
-            <button
-              type="submit"
-              disabled={!csvFile || csvLoading}
-              className="w-full py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-40 transition-colors"
-            >
-              {csvLoading ? 'Importing…' : 'Import'}
+            <button type="submit" disabled={!csvFile || csvLoading} className="neu-btn-accent w-full py-2.5 text-sm font-semibold">
+              {csvLoading ? 'Importing…' : 'Import transactions'}
             </button>
           </form>
 
           {csvResult && (
-            <div className={`mt-3 flex items-start gap-2 text-sm px-3 py-2 rounded-lg ${csvResult.error ? 'bg-red-50 text-red-700' : 'bg-green-50 text-green-700'}`}>
-              {csvResult.error ? <AlertCircle size={16} className="mt-0.5 shrink-0" /> : <CheckCircle size={16} className="mt-0.5 shrink-0" />}
-              <span>{csvResult.message ?? csvResult.error}</span>
+            <div className={`neu-inset flex items-start gap-2 text-sm px-4 py-3`}>
+              {csvResult.error
+                ? <AlertCircle size={15} className="mt-0.5 shrink-0" style={{ color: '#e05252' }} />
+                : <CheckCircle size={15} className="mt-0.5 shrink-0" style={{ color: '#48bb78' }} />}
+              <span style={{ color: csvResult.error ? '#e05252' : '#48bb78' }}>
+                {csvResult.message ?? csvResult.error}
+              </span>
             </div>
           )}
 
-          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-            <p className="text-xs font-medium text-gray-600 mb-1">Expected CSV format:</p>
-            <code className="text-xs text-gray-500 block">date,merchant,amount,category</code>
-            <code className="text-xs text-gray-500 block">2024-01-15,Starbucks,4.75,Food</code>
-            <code className="text-xs text-gray-500 block">2024-01-14,Netflix,15.99,Subscriptions</code>
+          <div className="neu-inset p-4">
+            <p className="text-xs font-semibold mb-2" style={{ color: '#6b7a8d' }}>Expected format</p>
+            {['date,merchant,amount,category', '2024-01-15,Starbucks,4.75,Food', '2024-01-14,Netflix,15.99,Subscriptions'].map(line => (
+              <code key={line} className="block text-xs" style={{ color: '#8896a7', fontFamily: 'monospace' }}>{line}</code>
+            ))}
           </div>
         </div>
 
         {/* Receipt Upload */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <div className="flex items-center gap-2 mb-1">
-            <Camera size={18} className="text-blue-600" />
-            <h3 className="font-semibold text-gray-900">Read a receipt</h3>
+        <div className="neu-card p-6 space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="neu-flat w-10 h-10 flex items-center justify-center rounded-xl">
+              <Camera size={18} style={{ color: '#6c9bcf' }} />
+            </div>
+            <div>
+              <h3 className="font-semibold" style={{ color: '#4a5568' }}>Scan receipt</h3>
+              <p className="text-xs" style={{ color: '#8896a7' }}>AI extracts details automatically</p>
+            </div>
           </div>
-          <p className="text-sm text-gray-500 mb-4">
-            Upload a photo and AI will extract the details.
-          </p>
 
           {!receiptData && !receiptSaved && (
             <div className="space-y-3">
               <div
-                className="border-2 border-dashed border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:border-blue-400 transition-colors"
+                className="neu-inset overflow-hidden cursor-pointer"
+                style={{ minHeight: 140 }}
                 onClick={() => receiptInputRef.current?.click()}
               >
                 {receiptPreview ? (
                   <img src={receiptPreview} alt="Receipt" className="w-full max-h-48 object-contain p-2" />
                 ) : (
-                  <div className="p-6 text-center">
-                    <Camera size={24} className="text-gray-300 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">Click to select image</p>
+                  <div className="flex flex-col items-center justify-center py-10">
+                    <Camera size={24} className="mb-2" style={{ color: '#a3b1c6' }} />
+                    <p className="text-sm" style={{ color: '#8896a7' }}>Click to select image</p>
                   </div>
                 )}
-                <input
-                  ref={receiptInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleReceiptSelect}
-                />
+                <input ref={receiptInputRef} type="file" accept="image/*" className="hidden" onChange={handleReceiptSelect} />
               </div>
 
               {receiptFile && (
-                <button
-                  onClick={handleReceiptUpload}
-                  disabled={receiptLoading}
-                  className="w-full py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-40 transition-colors"
-                >
+                <button onClick={handleReceiptUpload} disabled={receiptLoading}
+                  className="neu-btn-accent w-full py-2.5 text-sm font-semibold">
                   {receiptLoading ? 'Reading receipt…' : 'Extract details'}
                 </button>
               )}
 
               {receiptMessage && !receiptData && (
-                <p className="text-sm text-amber-700 bg-amber-50 px-3 py-2 rounded-lg">{receiptMessage}</p>
+                <div className="neu-inset px-4 py-3">
+                  <p className="text-sm" style={{ color: '#c9873a' }}>{receiptMessage}</p>
+                </div>
               )}
             </div>
           )}
 
           {receiptData && !receiptSaved && (
-            <form onSubmit={handleReceiptSave} className="space-y-3">
-              <p className="text-sm text-green-700 bg-green-50 px-3 py-2 rounded-lg">
-                Details extracted — review and confirm to save.
-              </p>
+            <form onSubmit={handleReceiptSave} className="space-y-4">
+              <div className="neu-inset px-4 py-2.5">
+                <p className="text-xs font-medium" style={{ color: '#48bb78' }}>✓ Details extracted — confirm to save</p>
+              </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">Merchant</label>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b7a8d' }}>Merchant</label>
                 <input value={merchant} onChange={e => setMerchant(e.target.value)} required
-                  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  className="neu-input w-full px-4 py-2.5 text-sm" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Amount ($)</label>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b7a8d' }}>Amount ($)</label>
                   <input type="number" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} required
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="neu-input w-full px-4 py-2.5 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Date</label>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b7a8d' }}>Date</label>
                   <input type="date" value={date} onChange={e => setDate(e.target.value)} required
-                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    className="neu-input w-full px-4 py-2.5 text-sm" />
                 </div>
               </div>
-              <div className="flex gap-2">
-                <button type="submit"
-                  className="flex-1 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                  Save transaction
-                </button>
+              <div className="flex gap-3">
+                <button type="submit" className="neu-btn-accent flex-1 py-2.5 text-sm font-semibold">Save</button>
                 <button type="button" onClick={() => { setReceiptData(null); setReceiptFile(null); setReceiptPreview(null) }}
-                  className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                  className="neu-btn px-5 py-2.5 text-sm font-medium" style={{ color: '#8896a7' }}>
                   Cancel
                 </button>
               </div>
@@ -250,12 +243,12 @@ export default function UploadPage() {
           )}
 
           {receiptSaved && (
-            <div className="text-center py-6">
-              <CheckCircle size={32} className="text-green-500 mx-auto mb-2" />
-              <p className="text-sm font-medium text-gray-900">Transaction saved!</p>
+            <div className="text-center py-8">
+              <div className="inline-flex w-14 h-14 rounded-2xl neu-flat items-center justify-center text-2xl mb-3">✅</div>
+              <p className="font-semibold" style={{ color: '#4a5568' }}>Transaction saved!</p>
               <button onClick={() => setReceiptSaved(false)}
-                className="mt-3 text-sm text-blue-600 hover:underline">
-                Read another receipt
+                className="mt-4 neu-btn px-5 py-2 text-sm font-medium" style={{ color: '#6c9bcf' }}>
+                Scan another
               </button>
             </div>
           )}

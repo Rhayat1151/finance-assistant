@@ -18,7 +18,6 @@ export default function LoginPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
@@ -31,54 +30,67 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Finance Assistant</h1>
-          <p className="text-gray-500 mt-1">Sign in to your account</p>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#e0e5ec' }}>
+      <div className="w-full max-w-md">
+        {/* Logo area */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 neu-card">
+            <span className="text-2xl">💰</span>
+          </div>
+          <h1 className="text-2xl font-bold" style={{ color: '#4a5568' }}>Finance Assistant</h1>
+          <p className="mt-1 text-sm" style={{ color: '#8896a7' }}>Your AI-powered money companion</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="you@example.com"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="••••••••"
-            />
-          </div>
+        {/* Card */}
+        <div className="neu-card p-8">
+          <h2 className="text-lg font-semibold mb-6" style={{ color: '#4a5568' }}>Welcome back</h2>
 
-          {error && <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#6b7a8d' }}>Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                className="neu-input w-full px-4 py-3 text-sm"
+                placeholder="you@example.com"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: '#6b7a8d' }}>Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                required
+                className="neu-input w-full px-4 py-3 text-sm"
+                placeholder="••••••••"
+              />
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-          >
-            {loading ? 'Signing in…' : 'Sign in'}
-          </button>
-        </form>
+            {error && (
+              <div className="neu-inset px-4 py-3">
+                <p className="text-sm" style={{ color: '#e05252' }}>{error}</p>
+              </div>
+            )}
 
-        <p className="mt-6 text-center text-sm text-gray-500">
-          No account?{' '}
-          <Link href="/signup" className="text-blue-600 hover:underline font-medium">
-            Create one
-          </Link>
-        </p>
+            <button
+              type="submit"
+              disabled={loading}
+              className="neu-btn-accent w-full py-3 text-sm font-semibold"
+            >
+              {loading ? 'Signing in…' : 'Sign in'}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm" style={{ color: '#8896a7' }}>
+            No account?{' '}
+            <Link href="/signup" className="font-semibold" style={{ color: '#6c9bcf' }}>
+              Create one
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )
