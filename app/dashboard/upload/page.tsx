@@ -17,6 +17,19 @@ export default function UploadPage() {
   const [csvResult, setCsvResult] = useState<{ message?: string; error?: string } | null>(null)
   const [csvLoading, setCsvLoading] = useState(false)
 
+  // Bank sync state
+  const [syncLoading, setSyncLoading] = useState(false)
+  const [syncResult, setSyncResult] = useState<{ message?: string; error?: string } | null>(null)
+
+  async function handleBankSync() {
+    setSyncLoading(true)
+    setSyncResult(null)
+    const res = await fetch('/api/transactions/sync', { method: 'POST' })
+    const json = await res.json()
+    setSyncResult(json)
+    setSyncLoading(false)
+  }
+
   // Receipt state
   const [receiptFile, setReceiptFile] = useState<File | null>(null)
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null)
@@ -106,6 +119,34 @@ export default function UploadPage() {
       <div>
         <h2 className="text-2xl font-bold" style={{ color: '#4a5568' }}>Import data</h2>
         <p className="text-sm mt-0.5" style={{ color: '#8896a7' }}>Add transactions via CSV or scan a receipt photo</p>
+      </div>
+
+      {/* Mock bank sync */}
+      <div className="neu-card p-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="neu-flat w-10 h-10 flex items-center justify-center rounded-xl text-lg">🏦</div>
+            <div>
+              <h3 className="font-semibold" style={{ color: '#4a5568' }}>Mock bank sync</h3>
+              <p className="text-xs" style={{ color: '#8896a7' }}>Simulates fetching recent transactions from a connected bank account</p>
+            </div>
+          </div>
+          <button
+            onClick={handleBankSync}
+            disabled={syncLoading}
+            className="neu-btn-accent px-5 py-2 text-sm font-semibold"
+          >
+            {syncLoading ? 'Syncing…' : 'Sync now'}
+          </button>
+        </div>
+        {syncResult && (
+          <div className="neu-inset px-4 py-3 mt-4 flex items-center gap-2 text-sm">
+            {syncResult.error
+              ? <><AlertCircle size={15} style={{ color: '#e05252' }} /><span style={{ color: '#e05252' }}>{syncResult.error}</span></>
+              : <><CheckCircle size={15} style={{ color: '#48bb78' }} /><span style={{ color: '#48bb78' }}>{syncResult.message}</span></>
+            }
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
