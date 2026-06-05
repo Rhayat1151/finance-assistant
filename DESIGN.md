@@ -148,6 +148,28 @@ Both records are stored; the assistant surfaces both to the user. Auto-resolutio
 
 ---
 
+## Challenges Faced and How I Handled Them
+
+**1. Next.js version mismatch (breaking change)**
+The `create-next-app` scaffolded Next.js 16, which had renamed `middleware.ts` to `proxy.ts` and changed the exported function name from `middleware` to `proxy`. This broke auth route protection silently — the middleware was running but not intercepting routes. Caught it during the build step (`npm run build` surfaced the deprecation warning). Fixed by reading the bundled docs in `node_modules/next/dist/docs/` and migrating the file and export name.
+
+**2. Supabase upsert ON CONFLICT with partial index**
+The deduplication strategy used a partial unique index (`WHERE dedup_hash IS NOT NULL`) to allow null hashes. But Supabase's PostgREST requires a full unconditional unique index for `ON CONFLICT` resolution. The import endpoint threw a 500 error on first CSV upload. Fixed by dropping the partial index and creating a full unique index — since every row in the import path always has a hash, nulls are never inserted.
+
+**3. Groq client instantiated at module level**
+The Groq SDK throws immediately if `GROQ_API_KEY` is missing — even during `next build`, which runs without env vars. This caused the build to fail with a cryptic error. Fixed by wrapping the client in a lazy singleton (instantiated on first use inside a request, not at module evaluation time).
+
+**4. Intent misclassification on typos**
+"unsula chrges" (typo for "unusual charges") was being classified as WEB_LOOKUP — the 8B model treated it as a merchant name lookup. Fixed by rewriting the classifier system prompt to explicitly handle near-matches and typos, with examples for ANOMALY_CHECK that include common misspellings.
+
+**5. Sample data from 2024, current date is 2026**
+The sample CSV has transactions from Jan–Mar 2024. Queries like "how much did I spend this month?" returned empty results and the model responded "no data available" — which looks broken. Fixed by detecting empty current-month results and falling back to the most recent available month, with a clear label ("showing March 2024, most recent data").
+
+**6. Vision model returning inconsistent JSON**
+The Groq Vision model sometimes returned markdown-wrapped JSON (```json ... ```) instead of raw JSON, causing `JSON.parse` to throw. Fixed by extracting with a regex (`content.match(/\{[\s\S]*\}/)`) that pulls the JSON object regardless of surrounding formatting.
+
+---
+
 ## What I Would Do With More Time
 
 1. **Streaming budget alerts mid-response** — if a query reveals a budget is over 80%, proactively surface it in the same response

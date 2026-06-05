@@ -8,7 +8,7 @@ import { searchMerchant } from '@/lib/tools/webSearch'
 import { handleBudgetCommand } from './budget-handler'
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount)
+  return new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 }).format(amount)
 }
 
 async function buildDataContext(
@@ -126,9 +126,9 @@ async function buildDataContext(
           const meta = r.receipt_metadata
           if (!meta) return `${r.date} — ${r.merchant}: ${formatCurrency(r.amount)}`
           const parts = [`${r.date} — ${r.merchant}: ${formatCurrency(r.amount)}`]
-          if (meta.tax) parts.push(`tax $${meta.tax}`)
-          if (meta.tip) parts.push(`tip $${meta.tip}`)
-          if (meta.discount) parts.push(`discount -$${meta.discount}`)
+          if (meta.tax) parts.push(`tax PKR ${meta.tax}`)
+          if (meta.tip) parts.push(`tip PKR ${meta.tip}`)
+          if (meta.discount) parts.push(`discount -PKR ${meta.discount}`)
           if (meta.payment_method) parts.push(`paid by ${meta.payment_method}`)
           if (meta.items?.length) parts.push(`${meta.items.length} items`)
           return parts.join(', ')
@@ -182,7 +182,7 @@ Rules:
 - If there is no data for the current month, say so and show the most recent available data instead
 - Always cite specific figures from the data provided
 - Never invent or estimate numbers not present in the data
-- Format currency as $X,XXX.XX
+- Format currency as PKR X,XXX (Pakistani Rupees, no decimal needed)
 - Keep responses under 200 words unless a summary is explicitly requested
 
 Current financial data:

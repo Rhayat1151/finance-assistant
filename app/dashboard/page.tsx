@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 
 function formatCurrency(n: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n)
+  return new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR', maximumFractionDigits: 0 }).format(n)
 }
 
 const CATEGORY_ICONS: Record<string, string> = {

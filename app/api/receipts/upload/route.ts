@@ -130,10 +130,11 @@ export async function PUT(req: NextRequest) {
 
   // Build a human-readable description summary
   const parts: string[] = []
-  if (extracted?.subtotal) parts.push(`Subtotal: $${extracted.subtotal}`)
-  if (extracted?.tax) parts.push(`Tax: $${extracted.tax}`)
-  if (extracted?.tip) parts.push(`Tip: $${extracted.tip}`)
-  if (extracted?.discount) parts.push(`Discount: -$${extracted.discount}`)
+  const fmt = (n: number) => `PKR ${n.toLocaleString('en-PK', { maximumFractionDigits: 0 })}`
+  if (extracted?.subtotal) parts.push(`Subtotal: ${fmt(extracted.subtotal)}`)
+  if (extracted?.tax) parts.push(`Tax: ${fmt(extracted.tax)}`)
+  if (extracted?.tip) parts.push(`Tip: ${fmt(extracted.tip)}`)
+  if (extracted?.discount) parts.push(`Discount: -${fmt(extracted.discount)}`)
   if (extracted?.payment_method) parts.push(`Paid by: ${extracted.payment_method}`)
   if (extracted?.receipt_number) parts.push(`Receipt #${extracted.receipt_number}`)
 

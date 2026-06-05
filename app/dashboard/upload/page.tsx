@@ -299,7 +299,7 @@ export default function UploadPage() {
                     <div key={r.label} className="flex justify-between text-xs">
                       <span style={{ color: '#8896a7' }}>{r.label}</span>
                       <span style={{ color: r.negative ? '#48bb78' : '#4a5568', fontWeight: 500 }}>
-                        {r.negative ? '-' : ''}${r.value?.toFixed(2)}
+                        {r.negative ? '-' : ''}Rs {r.value?.toLocaleString('en-PK', { maximumFractionDigits: 0 })}
                       </span>
                     </div>
                   ))}
@@ -339,7 +339,7 @@ export default function UploadPage() {
                         <span style={{ color: '#6b7a8d' }}>
                           {item.qty && item.qty > 1 ? `${item.qty}× ` : ''}{item.name}
                         </span>
-                        <span style={{ color: '#4a5568', fontWeight: 500 }}>${item.price?.toFixed(2)}</span>
+                        <span style={{ color: '#4a5568', fontWeight: 500 }}>Rs {item.price?.toLocaleString('en-PK', { maximumFractionDigits: 0 })}</span>
                       </div>
                     ))}
                   </div>
