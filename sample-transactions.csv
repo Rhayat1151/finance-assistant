@@ -1,0 +1,39 @@
+date,merchant,amount,category,description
+2024-01-02,Starbucks,4.75,Food,Morning coffee
+2024-01-03,Netflix,15.99,Subscriptions,Monthly plan
+2024-01-05,Whole Foods,87.43,Food,Weekly groceries
+2024-01-07,Uber,12.50,Transport,Ride to downtown
+2024-01-10,Amazon,34.99,Shopping,Books
+2024-01-12,Spotify,9.99,Subscriptions,Music streaming
+2024-01-15,Shell Gas Station,55.00,Transport,Fuel
+2024-01-17,CVS Pharmacy,23.45,Health,Vitamins
+2024-01-18,Starbucks,5.25,Food,Coffee
+2024-01-20,Netflix,15.99,Subscriptions,Monthly plan
+2024-01-22,Trader Joes,62.10,Food,Groceries
+2024-01-25,Lyft,9.75,Transport,Airport ride
+2024-01-28,Apple Music,10.99,Subscriptions,Music
+2024-02-01,Starbucks,4.75,Food,Coffee
+2024-02-03,Netflix,15.99,Subscriptions,Monthly plan
+2024-02-05,Whole Foods,94.20,Food,Groceries
+2024-02-08,Amazon,127.50,Shopping,Household items
+2024-02-10,Spotify,9.99,Subscriptions,Music streaming
+2024-02-12,Shell Gas Station,60.00,Transport,Fuel
+2024-02-14,Restaurant Valentines,85.00,Food,Dinner
+2024-02-18,Starbucks,5.25,Food,Coffee
+2024-02-20,Netflix,15.99,Subscriptions,Monthly plan
+2024-02-22,CVS Pharmacy,15.00,Health,Medicine
+2024-02-25,Gym Membership,40.00,Health,Monthly fee
+2024-02-28,Apple Music,10.99,Subscriptions,Music
+2024-03-01,Starbucks,4.75,Food,Coffee
+2024-03-03,Netflix,15.99,Subscriptions,Monthly plan
+2024-03-05,Whole Foods,78.90,Food,Groceries
+2024-03-08,Uber,18.00,Transport,Ride
+2024-03-10,Spotify,9.99,Subscriptions,Music streaming
+2024-03-12,Amazon,45.00,Shopping,Clothes
+2024-03-15,Electric Bill,120.00,Utilities,March electricity
+2024-03-18,Internet Bill,79.99,Utilities,Monthly internet
+2024-03-20,Netflix,15.99,Subscriptions,Monthly plan
+2024-03-22,Shell Gas Station,58.00,Transport,Fuel
+2024-03-25,Gym Membership,40.00,Health,Monthly fee
+2024-03-28,Apple Music,10.99,Subscriptions,Music
+2024-03-30,Starbucks,325.00,Food,Unusual large charge

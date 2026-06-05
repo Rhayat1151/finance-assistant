@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Personal Finance Assistant
 
-## Getting Started
+An AI-driven, multi-user financial companion built for the Revonix Full Stack AI Engineer assessment.
 
-First, run the development server:
+## Quick Start
+
+### 1. Clone & install
+
+```bash
+git clone <repo-url>
+cd finance-assistant
+npm install
+```
+
+### 2. Set up Supabase
+
+1. Create a free project at [supabase.com](https://supabase.com)
+2. In the **SQL Editor**, run the contents of `supabase/migrations/001_schema.sql`
+3. In **Project Settings → API**, copy your Project URL and keys
+
+### 3. Configure environment
+
+```bash
+cp .env.local.example .env.local
+```
+
+Fill in `.env.local`:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJh...
+SUPABASE_SERVICE_ROLE_KEY=eyJh...
+GROQ_API_KEY=gsk_...
+```
+
+Get your Groq API key at [console.groq.com](https://console.groq.com) (free).
+
+### 4. Run
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Usage
 
-## Learn More
+1. **Sign up** at `/signup` and verify your email
+2. **Import data** at `/dashboard/upload` — use `sample-transactions.csv` for quick testing
+3. **Chat** at `/dashboard/chat` — ask questions in plain English
+4. **View overview** at `/dashboard` — spending breakdown, budgets, recent transactions
 
-To learn more about Next.js, take a look at the following resources:
+### Example chat prompts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+How much did I spend on food last month?
+What subscriptions do I have?
+Am I spending more than usual this month?
+Any unusual charges?
+Set a $400 food budget
+I get paid on the 1st
+What is AMZN MKTP?
+Summarize my finances
+Where can I cut back?
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Architecture
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+See [DESIGN.md](DESIGN.md) for full design notes. Quick summary:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Intent classifier** (Llama 3.1 8B, ~200ms) routes every message to the right handler before any expensive work
+- **Pre-computed summaries** mean historical queries never scan raw transaction rows — always O(months) not O(transactions)
+- **Two-model strategy**: 8B for fast/cheap queries (<1s), 70B for reasoning-heavy tasks
+- **Streaming responses** via SSE so users see tokens instantly even for slow queries
+- **Row Level Security** at the database level — user data isolation enforced even if app code has a bug
+
+### Stack
+
+| Layer | Tech |
+|---|---|
+| Framework | Next.js 14 App Router |
+| Database + Auth | Supabase (Postgres) |
+| AI | Groq (Llama 3.1 8B / 70B + Llama 4 Vision) |
+| Styling | Tailwind CSS |
+
+---
+
+## CSV Format
+
+The importer accepts flexible CSV with these columns (case-insensitive):
+
+| Column | Required | Notes |
+|---|---|---|
+| `date` | Yes | Most date formats accepted |
+| `amount` | Yes | Positive = expense, negative = refund |
+| `merchant` | Yes | Store/vendor name |
+| `category` | No | Auto-inferred from merchant name if missing |
+| `description` | No | Optional notes |
+
+Duplicate rows (same date + amount + merchant) are silently skipped. Invalid rows are counted and reported.
