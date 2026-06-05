@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS transactions (
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS idx_tx_dedup ON transactions(dedup_hash) WHERE dedup_hash IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_tx_dedup ON transactions(dedup_hash);
 CREATE INDEX IF NOT EXISTS idx_tx_user_date     ON transactions(user_id, date DESC);
 CREATE INDEX IF NOT EXISTS idx_tx_user_category ON transactions(user_id, category);
 

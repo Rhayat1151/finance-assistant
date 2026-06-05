@@ -22,7 +22,19 @@ async function buildDataContext(
   switch (intent) {
     case 'SIMPLE_AGGREGATE': {
       const currentSpend = await getCurrentMonthSpend(supabase as any, userId)
-      const summaries = await getMonthlySummaries(supabase as any, userId, 3)
+      const summaries = await getMonthlySummaries(supabase as any, userId, 6)
+
+      // If no data for current month, fall back to most recent available month
+      if (currentSpend.length === 0 && summaries.length > 0) {
+        const latest = summaries[0]
+        const monthName = new Date(latest.year, latest.month - 1).toLocaleString('default', { month: 'long' })
+        const byCategory: Record<string, { total: number; count: number }> = {}
+        for (const s of summaries.filter(r => r.year === latest.year && r.month === latest.month)) {
+          byCategory[s.category] = { total: s.total, count: s.tx_count }
+        }
+        return `Note: No transactions found for the current month. Showing most recent data (${monthName} ${latest.year}):\n${Object.entries(byCategory).map(([cat, v]) => `${cat}: ${formatCurrency(v.total)} (${v.count} transactions)`).join('\n')}\n\nFull history:\n${JSON.stringify(summaries)}`
+      }
+
       return `Current month spend by category:\n${currentSpend.map(s => `${s.category}: ${formatCurrency(s.total)} (${s.tx_count} transactions)`).join('\n')}\n\nRecent monthly history:\n${JSON.stringify(summaries.slice(0, 30))}`
     }
 
@@ -50,15 +62,14 @@ async function buildDataContext(
     }
 
     case 'ANOMALY_CHECK': {
-      // Get last 90 days and compute z-scores per category
-      const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      // Get all transactions (or last 6 months) for anomaly detection
       const { data: txs } = await (supabase as any)
         .from('transactions')
         .select('date, merchant, amount, category')
         .eq('user_id', userId)
-        .gte('date', ninetyDaysAgo)
         .gt('amount', 0)
-        .order('amount', { ascending: false })
+        .order('date', { ascending: false })
+        .limit(500)
 
       if (!txs || txs.length === 0) return 'Not enough transaction data to detect anomalies.'
 
@@ -137,12 +148,15 @@ export async function POST(req: NextRequest) {
     buildDataContext(supabase as any, user.id, intent, message),
   ])
 
+  const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
   const systemPrompt = `You are a personal finance assistant. Be direct, use specific numbers, and keep responses concise.
+Today's date: ${today}
 ${userContext ? `\n${userContext}\n` : ''}
 Rules:
-- If data shows empty results, say so honestly — never invent numbers
+- Never ask the user what month it is — you already know today's date
+- If there is no data for the current month, say so and show the most recent available data instead
 - Always cite specific figures from the data provided
-- For ambiguous questions, ask one clarifying question
+- Never invent or estimate numbers not present in the data
 - Format currency as $X,XXX.XX
 - Keep responses under 200 words unless a summary is explicitly requested
 
