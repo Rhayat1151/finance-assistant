@@ -5,10 +5,20 @@ import { Upload, Camera, CheckCircle, AlertCircle } from 'lucide-react'
 
 interface ReceiptData {
   merchant: string | null
-  amount: number | null
   date: string | null
   currency: string | null
-  items: Array<{ name: string; price: number }> | null
+  subtotal: number | null
+  tax: number | null
+  tip: number | null
+  discount: number | null
+  total: number | null
+  payment_method: string | null
+  card_last4: string | null
+  receipt_number: string | null
+  store_address: string | null
+  cashier: string | null
+  items: Array<{ name: string; qty?: number; price: number }> | null
+  notes: string | null
 }
 
 export default function UploadPage() {
@@ -38,9 +48,9 @@ export default function UploadPage() {
   const [receiptLoading, setReceiptLoading] = useState(false)
   const [receiptSaved, setReceiptSaved] = useState(false)
 
-  // Form fields for receipt confirmation
+  // Editable confirmation fields
   const [merchant, setMerchant] = useState('')
-  const [amount, setAmount] = useState('')
+  const [total, setTotal] = useState('')
   const [date, setDate] = useState('')
 
   const csvInputRef = useRef<HTMLInputElement>(null)
@@ -94,7 +104,7 @@ export default function UploadPage() {
 
     setReceiptData(json.extracted)
     setMerchant(json.extracted.merchant ?? '')
-    setAmount(json.extracted.amount ? String(json.extracted.amount) : '')
+    setTotal(json.extracted.total ? String(json.extracted.total) : '')
     setDate(json.extracted.date ?? new Date().toISOString().split('T')[0])
     setReceiptMessage(json.message)
   }
@@ -104,7 +114,7 @@ export default function UploadPage() {
     const res = await fetch('/api/receipts/upload', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ merchant, amount: parseFloat(amount), date }),
+      body: JSON.stringify({ merchant, total: parseFloat(total), date, extracted: receiptData }),
     })
     if (res.ok) {
       setReceiptSaved(true)
@@ -254,28 +264,94 @@ export default function UploadPage() {
           {receiptData && !receiptSaved && (
             <form onSubmit={handleReceiptSave} className="space-y-4">
               <div className="neu-inset px-4 py-2.5">
-                <p className="text-xs font-medium" style={{ color: '#48bb78' }}>✓ Details extracted — confirm to save</p>
+                <p className="text-xs font-medium" style={{ color: '#48bb78' }}>✓ Details extracted — review and confirm to save</p>
               </div>
+
+              {/* Core editable fields */}
               <div>
-                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b7a8d' }}>Merchant</label>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b7a8d' }}>Merchant *</label>
                 <input value={merchant} onChange={e => setMerchant(e.target.value)} required
                   className="neu-input w-full px-4 py-2.5 text-sm" />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b7a8d' }}>Amount ($)</label>
-                  <input type="number" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} required
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b7a8d' }}>Total paid *</label>
+                  <input type="number" step="0.01" value={total} onChange={e => setTotal(e.target.value)} required
                     className="neu-input w-full px-4 py-2.5 text-sm" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b7a8d' }}>Date</label>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#6b7a8d' }}>Date *</label>
                   <input type="date" value={date} onChange={e => setDate(e.target.value)} required
                     className="neu-input w-full px-4 py-2.5 text-sm" />
                 </div>
               </div>
-              <div className="flex gap-3">
-                <button type="submit" className="neu-btn-accent flex-1 py-2.5 text-sm font-semibold">Save</button>
-                <button type="button" onClick={() => { setReceiptData(null); setReceiptFile(null); setReceiptPreview(null) }}
+
+              {/* Extracted breakdown — read-only display */}
+              {(receiptData.subtotal || receiptData.tax || receiptData.tip || receiptData.discount) && (
+                <div className="neu-inset p-4 space-y-2">
+                  <p className="text-xs font-semibold mb-2" style={{ color: '#6b7a8d' }}>Breakdown</p>
+                  {[
+                    { label: 'Subtotal', value: receiptData.subtotal },
+                    { label: 'Tax', value: receiptData.tax },
+                    { label: 'Tip', value: receiptData.tip },
+                    { label: 'Discount', value: receiptData.discount, negative: true },
+                  ].filter(r => r.value !== null).map(r => (
+                    <div key={r.label} className="flex justify-between text-xs">
+                      <span style={{ color: '#8896a7' }}>{r.label}</span>
+                      <span style={{ color: r.negative ? '#48bb78' : '#4a5568', fontWeight: 500 }}>
+                        {r.negative ? '-' : ''}${r.value?.toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Extra details */}
+              <div className="neu-inset p-4 space-y-2">
+                <p className="text-xs font-semibold mb-2" style={{ color: '#6b7a8d' }}>Additional details</p>
+                {[
+                  { label: 'Payment', value: receiptData.payment_method && receiptData.card_last4 ? `${receiptData.payment_method} ····${receiptData.card_last4}` : receiptData.payment_method },
+                  { label: 'Receipt #', value: receiptData.receipt_number },
+                  { label: 'Cashier', value: receiptData.cashier },
+                  { label: 'Address', value: receiptData.store_address },
+                  { label: 'Currency', value: receiptData.currency },
+                  { label: 'Notes', value: receiptData.notes },
+                ].filter(r => r.value).map(r => (
+                  <div key={r.label} className="flex justify-between text-xs gap-4">
+                    <span style={{ color: '#8896a7' }}>{r.label}</span>
+                    <span className="text-right" style={{ color: '#4a5568' }}>{r.value}</span>
+                  </div>
+                ))}
+                {!receiptData.payment_method && !receiptData.receipt_number && !receiptData.cashier && (
+                  <p className="text-xs" style={{ color: '#a3b1c6' }}>No additional details extracted</p>
+                )}
+              </div>
+
+              {/* Items list */}
+              {receiptData.items && receiptData.items.length > 0 && (
+                <div className="neu-inset p-4">
+                  <p className="text-xs font-semibold mb-3" style={{ color: '#6b7a8d' }}>
+                    Items ({receiptData.items.length})
+                  </p>
+                  <div className="space-y-1.5">
+                    {receiptData.items.map((item, i) => (
+                      <div key={i} className="flex justify-between text-xs">
+                        <span style={{ color: '#6b7a8d' }}>
+                          {item.qty && item.qty > 1 ? `${item.qty}× ` : ''}{item.name}
+                        </span>
+                        <span style={{ color: '#4a5568', fontWeight: 500 }}>${item.price?.toFixed(2)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-1">
+                <button type="submit" className="neu-btn-accent flex-1 py-2.5 text-sm font-semibold">
+                  Save transaction
+                </button>
+                <button type="button"
+                  onClick={() => { setReceiptData(null); setReceiptFile(null); setReceiptPreview(null) }}
                   className="neu-btn px-5 py-2.5 text-sm font-medium" style={{ color: '#8896a7' }}>
                   Cancel
                 </button>

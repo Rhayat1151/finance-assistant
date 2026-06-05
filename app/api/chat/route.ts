@@ -107,10 +107,35 @@ async function buildDataContext(
       return `3-month spending summary:\n${JSON.stringify(summaries)}\n\nSubscriptions: ${JSON.stringify(subs.data ?? [])}`
     }
 
-    default:
-      return await getCurrentMonthSpend(supabase as any, userId).then(s =>
-        s.length > 0 ? `Current month spend:\n${s.map(x => `${x.category}: ${formatCurrency(x.total)}`).join('\n')}` : ''
-      )
+    default: {
+      const currentSpend = await getCurrentMonthSpend(supabase as any, userId)
+      const { data: recentReceipts } = await (supabase as any)
+        .from('transactions')
+        .select('date, merchant, amount, description, receipt_metadata')
+        .eq('user_id', userId)
+        .eq('source', 'receipt')
+        .order('date', { ascending: false })
+        .limit(5)
+
+      let context = currentSpend.length > 0
+        ? `Current month spend:\n${currentSpend.map((x: any) => `${x.category}: ${formatCurrency(x.total)}`).join('\n')}`
+        : ''
+
+      if (recentReceipts && recentReceipts.length > 0) {
+        context += `\n\nRecent receipts:\n${recentReceipts.map((r: any) => {
+          const meta = r.receipt_metadata
+          if (!meta) return `${r.date} — ${r.merchant}: ${formatCurrency(r.amount)}`
+          const parts = [`${r.date} — ${r.merchant}: ${formatCurrency(r.amount)}`]
+          if (meta.tax) parts.push(`tax $${meta.tax}`)
+          if (meta.tip) parts.push(`tip $${meta.tip}`)
+          if (meta.discount) parts.push(`discount -$${meta.discount}`)
+          if (meta.payment_method) parts.push(`paid by ${meta.payment_method}`)
+          if (meta.items?.length) parts.push(`${meta.items.length} items`)
+          return parts.join(', ')
+        }).join('\n')}`
+      }
+      return context
+    }
   }
 }
 
